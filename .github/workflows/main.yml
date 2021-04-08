@@ -83,5 +83,5 @@ jobs:
       with:
         artifacts: "Flutter-SDK-ARM64.zip"
         tag: Flutter-SDK-${{ steps.date.outputs.date }}
-        token: ${{ secrets.RELEASE_TOKEN }}
+        token: ${{ secrets.GH_TOKEN }}
         allowUpdates: true
