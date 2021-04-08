@@ -1,0 +1,56 @@
+name: Main
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: 00 18 * * *
+  watch:
+    types: [started]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-flutter-engine:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@v4
+      with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-haskell: 'true'
+          remove-android: 'true'
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Echo Free space
+      run: |
+          echo "Free space:"
+          df -h
+    - name: Fetch zhzhzhy/Build_Flutter_Engine_ARM Github Release Asset
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+          repo: "zhzhzhy/Build_Flutter_Engine_ARM"
+          version: "latest"
+          file: "linux_release_arm64.zip"
+          target: "linux_release_arm64.zip"
+    - name: Fetch zhzhzhy/Build_Dart_ARM_SDK Github Release Asset
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+          repo: "zhzhzhy/Build_Dart_ARM_SDK"
+          version: "latest"
+          file: "dart-sdk-android-arm64.zip"
+          target: "dart-sdk-android-arm64.zip"
+    - name: Unzip Release
+      run: |
+          export WORKDIR=`pwd`
+          ls $WORKDIR
+          unzip dart-sdk-android-arm64.zip
+          unzip linux_release_arm64.zip
+          ls
+      
