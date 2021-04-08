@@ -1,0 +1,87 @@
+name: Main
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: 00 18 * * *
+  watch:
+    types: [started]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  Generate-Flutter-SDK:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@v4
+      with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-haskell: 'true'
+          remove-android: 'true'
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Echo Free space
+      run: |
+          echo "Free space:"
+          df -h
+    - name: Fetch zhzhzhy/Build_Flutter_Engine_ARM Github Release Asset
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+          repo: "zhzhzhy/Build_Flutter_Engine_ARM"
+          version: "latest"
+          file: "linux_release_arm64.zip"
+          target: "linux_release_arm64.zip"
+    - name: Fetch zhzhzhy/Build_Dart_ARM_SDK Github Release Asset
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+          repo: "zhzhzhy/Build_Dart_ARM_SDK"
+          version: "latest"
+          file: "dart-sdk-android-arm64.zip"
+          target: "dart-sdk-android-arm64.zip"
+    - name: Get & Init Flutter-SDK
+      run: |
+          git clone https://github.com/flutter/flutter.git -b stable --depth 1
+          export PATH="$PATH:`pwd`/flutter/bin"
+          flutter precache
+    - name: Unzip Release
+      run: |
+          export WORKDIR=`pwd`
+          ls $WORKDIR
+          unzip dart-sdk-android-arm64.zip
+          unzip linux_release_arm64.zip
+          ls
+
+    - name: Assemble Flutter-SDK-ARM
+      run: |
+        export WORKDIR=`pwd`
+        export flutter_engine_dir="$WORKDIR/ReleaseAndroidARM64/"
+        export dart_sdk_dir="$WORKDIR/linux_release_arm64/"
+        export flutter_sdk_dir="$WORKDIR/flutter/"
+        cp -R $dart_sdk_dir/dart-sdk $flutter_sdk_dir/bin/cache/
+    - name: Zip SDK
+      run: |
+        ls
+        zip -q -r Flutter-SDK-ARM64.zip flutter
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+    - name: Test with environment variables
+      run: echo $TAG_NAME - $RELEASE_TIME
+      env:
+          TAG_NAME: Flutter-SDK
+          RELEASE_TIME: ${{ steps.date.outputs.date }}
+    - name: Release SDK
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "Flutter-SDK-ARM64.zip"
+        tag: Flutter-SDK-${{ steps.date.outputs.date }}
+        token: ${{ secrets.GH_TOKEN }}
+        allowUpdates: true
