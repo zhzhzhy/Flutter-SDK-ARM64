@@ -46,6 +46,11 @@ jobs:
           version: "latest"
           file: "dart-sdk-android-arm64.zip"
           target: "dart-sdk-android-arm64.zip"
+    - name: Get & Init Flutter-SDK
+      run: |
+          git clone https://github.com/flutter/flutter.git -b stable --depth 1
+          export PATH="$PATH:`pwd`/flutter/bin"
+          flutter precache
     - name: Unzip Release
       run: |
           export WORKDIR=`pwd`
@@ -54,4 +59,29 @@ jobs:
           unzip linux_release_arm64.zip
           ls
 
-      
+    - name: Assemble Flutter-SDK-ARM
+      run: |
+        export WORKDIR=`pwd`
+        export Flutter-Engine-DIR="$WORKDIR/ReleaseAndroidARM64/"
+        export Dart-SDK-DIR="$WORKDIR/linux_release_arm64/"
+        export Flutter-SDK-DIR="$WORKDIR/flutter/"
+        cp -R $Dart-SDK-DIR/dart-sdk $Flutter-SDK-DIR/bin/cache/
+    - name: Zip SDK
+      run: |
+        ls
+        zip -q -r Flutter-SDK-ARM64.zip flutter
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+    - name: Test with environment variables
+      run: echo $TAG_NAME - $RELEASE_TIME
+      env:
+          TAG_NAME: Flutter-SDK
+          RELEASE_TIME: ${{ steps.date.outputs.date }}
+    - name: Release SDK
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "Flutter-SDK-ARM64.zip"
+        tag: Flutter-SDK-${{ steps.date.outputs.date }}
+        token: ${{ secrets.RELEASE_TOKEN }}
+        allowUpdates: true
