@@ -85,3 +85,4 @@ jobs:
         tag: Flutter-SDK-${{ steps.date.outputs.date }}
         token: ${{ secrets.RELEASE_TOKEN }}
         allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}
