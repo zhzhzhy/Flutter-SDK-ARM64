@@ -61,11 +61,11 @@ jobs:
 
     - name: Assemble Flutter-SDK-ARM
       run: |
-        echo `pwd`
-        export Flutter-Engine-DIR="`pwd`/ReleaseAndroidARM64"
-        export Dart-SDK-DIR="`pwd`/linux_release_arm64"
-        export Flutter-SDK-DIR="`pwd`/flutter"
-        cp -R $Dart-SDK-DIR/dart-sdk $Flutter-SDK-DIR/bin/cache/
+        export WORKDIR=`pwd`
+        export flutter_engine_dir="$WORKDIR/ReleaseAndroidARM64/"
+        export dart_sdk_dir="$WORKDIR/linux_release_arm64/"
+        export flutter_sdk_dir="$WORKDIR/flutter/"
+        cp -R $dart_sdk_dir/dart-sdk $flutter_sdk_dir/bin/cache/
     - name: Zip SDK
       run: |
         ls
