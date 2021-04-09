@@ -51,8 +51,8 @@ jobs:
       with:
           repo: "zhzhzhy/Build_Dart_ARM_SDK"
           version: "latest"
-          file: "dart-sdk-android-arm64.zip"
-          target: "dart-sdk-android-arm64.zip"
+          file: "dart-sdk-linux-arm64.zip"
+          target: "dart-sdk-linux-arm64.zip"
     - name: Get & Init Flutter-SDK
       run: |
           git clone https://github.com/flutter/flutter.git -b stable --depth 1
@@ -72,7 +72,7 @@ jobs:
         export WORKDIR=`pwd`
         export flutter_engine_dir_debug="$WORKDIR/linux_release_arm64"
         export flutter_engine_dir_release="$WORKDIR/linux_debug_arm64"
-        export dart_sdk_dir="$WORKDIR/ReleaseAndroidARM64"
+        export dart_sdk_dir="$WORKDIR/ReleaseXARM64"
         export flutter_sdk_dir="$WORKDIR/flutter"
         rsync -avP $dart_sdk_dir/dart-sdk $flutter_sdk_dir/bin/cache/
         rsync -avP $flutter_engine_dir_debug/flutter_patched_sdk $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk/
