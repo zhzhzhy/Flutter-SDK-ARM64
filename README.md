@@ -11,6 +11,8 @@ The flutter will download and overwrite dart-arm64-linux
 so you may manually download and replace dart again:
 [dart-release for ARM](https://github.com/zhzhzhy/Build_Dart_ARM_SDK/releases/tag/Dart-SDK-2021-04-08)
 
+Copy the Flutter SDK artifacts (build data) to ${your installpath}/bin/cache/artifacts/engine directory manually.
+
 - The result
 
 ![result](https://github.com/zhzhzhy/Flutter-SDK-ARM64/blob/main/img/Screenshot)
