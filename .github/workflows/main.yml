@@ -32,20 +32,35 @@ jobs:
       run: |
           echo "Free space:"
           df -h
-    - name: Fetch zhzhzhy/Build_Flutter_Engine_ARM64 Github Release zip
+    - name: Fetch Linux Release zip from zhzhzhy/Build_Flutter_Engine_ARM64 Github 
       uses: dsaltares/fetch-gh-release-asset@master
       with:
           repo: "zhzhzhy/Build_Flutter_Engine_ARM64"
           version: "latest"
           file: "linux_release_arm64.zip"
           target: "linux_release_arm64.zip"
-    - name: Fetch zhzhzhy/Build_Flutter_Engine_ARM64 Github Debug Release zip
+    - name: Fetch Linux Debug Release zip from zhzhzhy/Build_Flutter_Engine_ARM64 Github 
       uses: dsaltares/fetch-gh-release-asset@master
       with:
           repo: "zhzhzhy/Build_Flutter_Engine_ARM64"
           version: "latest"
           file: "linux_debug_arm64.zip"
           target: "linux_debug_arm64.zip"
+    - name: Fetch Android Release zip from zhzhzhy/Build_Flutter_Engine_ARM64 Github 
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+          repo: "zhzhzhy/Build_Flutter_Engine_ARM64"
+          version: "latest"
+          file: "android_release_arm64.zip"
+          target: "android_release_arm64.zip"
+    - name: Fetch Android Debug Release zip from zhzhzhy/Build_Flutter_Engine_ARM64 Github 
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+          repo: "zhzhzhy/Build_Flutter_Engine_ARM64"
+          version: "latest"
+          file: "android_debug_arm64.zip"
+          target: "android_debug_arm64.zip"
+
     - name: Fetch zhzhzhy/Build_Dart_ARM_SDK Github Release Asset
       uses: dsaltares/fetch-gh-release-asset@master
       with:
@@ -53,6 +68,13 @@ jobs:
           version: "latest"
           file: "dart-sdk-linux-arm64.zip"
           target: "dart-sdk-linux-arm64.zip"
+    - name: Fetch zhzhzhy/Build_Dart_ARM_SDK Github Release Asset for Android
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+          repo: "zhzhzhy/Build_Dart_ARM_SDK"
+          version: "latest"
+          file: "dart-sdk-android-arm64.zip"
+          target: "dart-sdk-android-arm64.zip"
     - name: Get & Init Flutter-SDK
       run: |
           git clone https://github.com/flutter/flutter.git -b stable --depth 1
@@ -62,11 +84,14 @@ jobs:
           export WORKDIR=`pwd`
           ls $WORKDIR
           unzip dart-sdk-linux-arm64.zip
+          unzip dart-sdk-android-arm64.zip
           unzip linux_release_arm64.zip
           unzip linux_debug_arm64.zip
+          unzip android_debug_arm64.zip
+          unzip android_debug_arm64.zip
           ls
 
-    - name: Assemble Flutter-SDK-ARM
+    - name: Assemble Flutter-SDK-ARM64 & Zip SDK
       run: |
         export PATH="$PATH:`pwd`/flutter/bin"
         export WORKDIR=`pwd`
@@ -85,10 +110,34 @@ jobs:
         rsync -avP $flutter_engine_dir_release/{flutter_linux,libflutter_linux_gtk.so} $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
         mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
         rsync -avP $flutter_engine_dir_release/clang_x64/gen_snapshot $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
-    - name: Zip SDK
-      run: |
         ls
         zip -q -r Flutter-SDK-ARM64.zip flutter
+    - name: Assemble Flutter-SDK-Android-ARM64 & Zip SDK
+      run: |
+        export PATH="$PATH:`pwd`/flutter/bin"
+        export WORKDIR=`pwd`
+        export flutter_engine_dir_debug="$WORKDIR/android_release_arm64"
+        export flutter_engine_dir_release="$WORKDIR/android_debug_arm64"
+        export dart_sdk_dir="$WORKDIR/ReleaseAndroidARM64"
+        export flutter_sdk_dir="$WORKDIR/flutter"
+        rsync -avP $dart_sdk_dir/dart-sdk $flutter_sdk_dir/bin/cache/
+        # mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk/
+        rsync -avP $flutter_engine_dir_debug/flutter_patched_sdk $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk/
+        # mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64/
+        rsync -avP $flutter_engine_dir_debug/{flutter_linux,gen/const_finder.dart.snapshot,flutter_tester,font-subset,gen/frontend_server.dart.snapshot,icudtl.dat,libflutter_linux_gtk.so,gen/flutter/lib/snapshot/isolate_snapshot.bin,gen/flutter/lib/snapshot/vm_isolate_snapshot.bin} $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64/
+        # mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk_product/
+        rsync -avP $flutter_engine_dir_release/flutter_patched_sdk $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk_product/
+        # mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
+        rsync -avP $flutter_engine_dir_release/{flutter_linux,libflutter_linux_gtk.so} $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
+        # mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
+        rsync -avP $flutter_engine_dir_release/clang_x64/gen_snapshot $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
+        ls
+        zip -q -r Flutter-SDK-Android-ARM64.zip flutter
+    - name: Put Release Zip all together
+      run: |
+        mkdir release
+        cp {Flutter-SDK-ARM64.zip,Flutter-SDK-Android-ARM64.zip} release/
+        ls release
     - name: Get current date
       id: date
       run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
@@ -100,7 +149,7 @@ jobs:
     - name: Release SDK
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "Flutter-SDK-ARM64.zip"
-        tag: Flutter-SDK-${{ steps.date.outputs.date }}
+        artifacts: "release/*.zip"
+        tag: Flutter-SDK-ARM64-${{ steps.date.outputs.date }}
         token: ${{ secrets.GH_TOKEN }}
         allowUpdates: true
