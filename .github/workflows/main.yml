@@ -62,7 +62,7 @@ jobs:
       run: |
           export WORKDIR=`pwd`
           ls $WORKDIR
-          unzip dart-sdk-android-arm64.zip
+          unzip dart-sdk-linux-arm64.zip
           unzip linux_release_arm64.zip
           unzip linux_debug_arm64.zip
           ls
