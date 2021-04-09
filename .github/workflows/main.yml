@@ -69,6 +69,7 @@ jobs:
     - name: Assemble Flutter-SDK-ARM
       run: |
         export PATH="$PATH:`pwd`/flutter/bin"
+        flutter doctor
         export WORKDIR=`pwd`
         export flutter_engine_dir_debug="$WORKDIR/linux_release_arm64"
         export flutter_engine_dir_release="$WORKDIR/linux_debug_arm64"
@@ -77,12 +78,14 @@ jobs:
         rsync -avP $dart_sdk_dir/dart-sdk $flutter_sdk_dir/bin/cache/
         mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk/
         rsync -avP $flutter_engine_dir_debug/flutter_patched_sdk $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk/
-        #       mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64/
+        mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64/
         rsync -avP $flutter_engine_dir_debug/{flutter_linux,gen/const_finder.dart.snapshot,flutter_tester,font-subset,gen/frontend_server.dart.snapshot,icudtl.dat,libflutter_linux_gtk.so,gen/flutter/lib/snapshot/isolate_snapshot.bin,gen/flutter/lib/snapshot/vm_isolate_snapshot.bin} $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64/
+        mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk_product/
         rsync -avP $flutter_engine_dir_release/flutter_patched_sdk $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk_product/
+        mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
         rsync -avP $flutter_engine_dir_release/{flutter_linux,libflutter_linux_gtk.so} $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
+        mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
         rsync -avP $flutter_engine_dir_release/clang_x64/gen_snapshot $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
-        # flutter doctor
     - name: Zip SDK
       run: |
         ls
