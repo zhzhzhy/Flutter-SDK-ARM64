@@ -32,13 +32,20 @@ jobs:
       run: |
           echo "Free space:"
           df -h
-    - name: Fetch zhzhzhy/Build_Flutter_Engine_ARM Github Release Asset
+    - name: Fetch zhzhzhy/Build_Flutter_Engine_ARM Github Release zip
       uses: dsaltares/fetch-gh-release-asset@master
       with:
           repo: "zhzhzhy/Build_Flutter_Engine_ARM64"
           version: "latest"
           file: "linux_release_arm64.zip"
           target: "linux_release_arm64.zip"
+    - name: Fetch zhzhzhy/Build_Flutter_Engine_ARM Github Debug Release zip
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+          repo: "zhzhzhy/Build_Flutter_Engine_ARM64"
+          version: "latest"
+          file: "linux_debug_arm64.zip"
+          target: "linux_debug_arm64.zip"
     - name: Fetch zhzhzhy/Build_Dart_ARM_SDK Github Release Asset
       uses: dsaltares/fetch-gh-release-asset@master
       with:
@@ -57,17 +64,22 @@ jobs:
           ls $WORKDIR
           unzip dart-sdk-android-arm64.zip
           unzip linux_release_arm64.zip
+          unzip linux_debug_arm64.zip
           ls
 
     - name: Assemble Flutter-SDK-ARM
       run: |
         export WORKDIR=`pwd`
-        export flutter_engine_dir="$WORKDIR/ReleaseAndroidARM64/"
-        export dart_sdk_dir="$WORKDIR/linux_release_arm64/"
-        export flutter_sdk_dir="$WORKDIR/flutter/"
+        export flutter_engine_dir_debug="$WORKDIR/linux_release_arm64"
+        export flutter_engine_dir_release="$WORKDIR/linux_debug_arm64"
+        export dart_sdk_dir="$WORKDIR/ReleaseAndroidARM64"
+        export flutter_sdk_dir="$WORKDIR/flutter"
         cp -R $dart_sdk_dir/dart-sdk $flutter_sdk_dir/bin/cache/
-        cp -R $flutter_engine_dir/flutter_patched_sdk $$flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk
-        cp -R $flutter_engine_dir/{flutter_linux,gen/{const_finder.dart.snapshot, flutter_tester, font-subset},gen/{frontend_server.dart.snapshot, icudtl.dat, libflutter_linux_gtk.so},gen/flutter/lib/snapshot/isolate_snapshot.bin,gen/flutter/lib/snapshot/vm_isolate_snapshot.bin} $flutter_sdk_dir/bin/cache/artifacts/engine/artifacts/engine/linux-x64
+        cp -R $flutter_engine_dir_debug/flutter_patched_sdk $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk
+        cp -R $flutter_engine_dir_debug/{flutter_linux,gen/const_finder.dart.snapshot,flutter_tester,font-subset,gen/frontend_server.dart.snapshot,icudtl.dat,libflutter_linux_gtk.so,gen/flutter/lib/snapshot/isolate_snapshot.bin,gen/flutter/lib/snapshot/vm_isolate_snapshot.bin} $flutter_sdk_dir/bin/cache/artifacts/engine/artifacts/engine/linux-x64
+        cp -R $flutter_engine_dir_release/flutter_patched_sdk $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk_product
+        cp -R $flutter_engine_dir_release/{flutter_linux,libflutter_linux_gtk.so} $flutter_sdk_dir/bin/cache/artifacts/engine/artifacts/engine/linux-x64-release
+        cp -R $flutter_engine_dir_release/clang_x64/gen_snapshot $flutter_sdk_dir/bin/cache/artifacts/engine/artifacts/engine/linux-x64-release
     - name: Zip SDK
       run: |
         ls
