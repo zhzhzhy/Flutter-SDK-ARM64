@@ -75,6 +75,7 @@ jobs:
         export dart_sdk_dir="$WORKDIR/ReleaseXARM64"
         export flutter_sdk_dir="$WORKDIR/flutter"
         rsync -avP $dart_sdk_dir/dart-sdk $flutter_sdk_dir/bin/cache/
+        mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk/
         rsync -avP $flutter_engine_dir_debug/flutter_patched_sdk $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk/
         #       mkdir -p $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64/
         rsync -avP $flutter_engine_dir_debug/{flutter_linux,gen/const_finder.dart.snapshot,flutter_tester,font-subset,gen/frontend_server.dart.snapshot,icudtl.dat,libflutter_linux_gtk.so,gen/flutter/lib/snapshot/isolate_snapshot.bin,gen/flutter/lib/snapshot/vm_isolate_snapshot.bin} $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64/
