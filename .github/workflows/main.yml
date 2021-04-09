@@ -69,7 +69,6 @@ jobs:
     - name: Assemble Flutter-SDK-ARM
       run: |
         export PATH="$PATH:`pwd`/flutter/bin"
-        flutter doctor
         export WORKDIR=`pwd`
         export flutter_engine_dir_debug="$WORKDIR/linux_release_arm64"
         export flutter_engine_dir_release="$WORKDIR/linux_debug_arm64"
