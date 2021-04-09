@@ -57,7 +57,6 @@ jobs:
       run: |
           git clone https://github.com/flutter/flutter.git -b stable --depth 1
           export PATH="$PATH:`pwd`/flutter/bin"
-          flutter precache
     - name: Unzip Release
       run: |
           export WORKDIR=`pwd`
@@ -69,6 +68,7 @@ jobs:
 
     - name: Assemble Flutter-SDK-ARM
       run: |
+        export PATH="$PATH:`pwd`/flutter/bin"
         export WORKDIR=`pwd`
         export flutter_engine_dir_debug="$WORKDIR/linux_release_arm64"
         export flutter_engine_dir_release="$WORKDIR/linux_debug_arm64"
@@ -81,6 +81,7 @@ jobs:
         rsync -avP $flutter_engine_dir_release/flutter_patched_sdk $flutter_sdk_dir/bin/cache/artifacts/engine/common/flutter_patched_sdk_product/
         rsync -avP $flutter_engine_dir_release/{flutter_linux,libflutter_linux_gtk.so} $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
         rsync -avP $flutter_engine_dir_release/clang_x64/gen_snapshot $flutter_sdk_dir/bin/cache/artifacts/engine/linux-x64-release/
+        # flutter doctor
     - name: Zip SDK
       run: |
         ls
