@@ -88,7 +88,7 @@ jobs:
           unzip linux_release_arm64.zip
           unzip linux_debug_arm64.zip
           unzip android_debug_arm64.zip
-          unzip android_release_arm64.zip
+          unzip android_debug_arm64.zip
           ls
 
     - name: Assemble Flutter-SDK-ARM64 & Zip SDK
