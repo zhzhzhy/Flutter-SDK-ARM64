@@ -77,7 +77,7 @@ jobs:
           target: "dart-sdk-android-arm64.zip"
     - name: Get & Init Flutter-SDK
       run: |
-          git clone https://github.com/flutter/flutter.git -b stable --depth 1
+          git clone https://github.com/flutter/flutter.git --depth 1
           export PATH="$PATH:`pwd`/flutter/bin"
     - name: Unzip Release
       run: |
